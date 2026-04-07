@@ -227,8 +227,12 @@ function renderReviewCard(activeWord, dueWords) {
     <div class="word-title-row">
       <h3>${escapeHtml(activeWord.word)}</h3>
       <div class="badge-row">
-        <span class="info-badge">${escapeHtml(activeWord.cefrLevel || "Unknown")}</span>
-        <span class="info-badge secondary-badge">${escapeHtml(activeWord.oxfordLevel || "Unknown")}</span>
+        <span class="info-badge ${getCefrBadgeClass(activeWord.cefrLevel)}">${escapeHtml(
+          activeWord.cefrLevel || "Unknown"
+        )}</span>
+        <span class="info-badge ${getOxfordBadgeClass(activeWord.oxfordLevel)}">${escapeHtml(
+          activeWord.oxfordLevel || "Unknown"
+        )}</span>
       </div>
     </div>
     <p class="word-phonetic">${escapeHtml(activeWord.phonetic || "未提供音標")}</p>
@@ -291,7 +295,9 @@ function renderUpcomingList(upcomingWords, activeWord) {
         <button class="list-item ${activeWord && activeWord.id === word.id ? "is-active" : ""}" type="button" data-select-id="${word.id}">
           <div class="list-item-top">
             <strong>${escapeHtml(word.word)}</strong>
-            <span class="mini-badge">${escapeHtml(word.cefrLevel || "Unknown")}</span>
+            <span class="mini-badge ${getCefrBadgeClass(word.cefrLevel)}">${escapeHtml(
+              word.cefrLevel || "Unknown"
+            )}</span>
           </div>
           <span>${escapeHtml(word.meaning)}</span>
           <small>${formatDateTime(word.nextReviewAt)}</small>
@@ -316,10 +322,17 @@ function renderAllWordsList(activeWord) {
         <button class="list-item ${activeWord && activeWord.id === word.id ? "is-active" : ""}" type="button" data-word-id="${word.id}">
           <div class="list-item-top">
             <strong>${escapeHtml(word.word)}</strong>
-            <span class="mini-badge">${escapeHtml(word.cefrLevel || "Unknown")}</span>
+            <span class="mini-badge ${getCefrBadgeClass(word.cefrLevel)}">${escapeHtml(
+              word.cefrLevel || "Unknown"
+            )}</span>
           </div>
           <span>${escapeHtml(word.meaning)}</span>
-          <small>${escapeHtml(word.oxfordLevel || "Unknown")} ・ 下次複習：${formatDateTime(word.nextReviewAt)}</small>
+          <small>
+            <span class="inline-oxford ${getOxfordTextClass(word.oxfordLevel)}">${escapeHtml(
+              word.oxfordLevel || "Unknown"
+            )}</span>
+            ・ 下次複習：${formatDateTime(word.nextReviewAt)}
+          </small>
         </button>
       `
     )
@@ -705,6 +718,39 @@ function getPermissionLabel(permission) {
     return "不支援";
   }
   return "未開啟";
+}
+
+function getCefrBadgeClass(level) {
+  const normalized = String(level || "").toUpperCase();
+  if (["A1", "A2", "B1", "B2"].includes(normalized)) {
+    return "badge-cefr-basic";
+  }
+  if (["C1", "C2"].includes(normalized)) {
+    return "badge-cefr-advanced";
+  }
+  return "badge-neutral";
+}
+
+function getOxfordBadgeClass(level) {
+  const normalized = String(level || "").toLowerCase();
+  if (normalized.includes("oxford 3000")) {
+    return "badge-oxford-3000";
+  }
+  if (normalized.includes("oxford 5000")) {
+    return "badge-oxford-5000";
+  }
+  return "badge-neutral";
+}
+
+function getOxfordTextClass(level) {
+  const normalized = String(level || "").toLowerCase();
+  if (normalized.includes("oxford 3000")) {
+    return "text-oxford-3000";
+  }
+  if (normalized.includes("oxford 5000")) {
+    return "text-oxford-5000";
+  }
+  return "text-neutral";
 }
 
 function setLookupStatus(message, type) {

@@ -327,14 +327,50 @@ button {
   font-weight: 700;
 }
 
-.secondary-badge {
-  background: rgba(43, 139, 124, 0.12);
-  color: #1f7267;
-}
-
 .mini-badge {
   min-height: 26px;
   font-size: 0.76rem;
+}
+
+.badge-cefr-basic {
+  background: rgba(41, 112, 255, 0.14);
+  color: #1850b8;
+}
+
+.badge-cefr-advanced {
+  background: rgba(226, 61, 83, 0.14);
+  color: #b3263d;
+}
+
+.badge-oxford-3000 {
+  background: rgba(55, 164, 93, 0.14);
+  color: #1f7b40;
+}
+
+.badge-oxford-5000 {
+  background: rgba(235, 97, 166, 0.16);
+  color: #b13372;
+}
+
+.badge-neutral {
+  background: rgba(121, 113, 103, 0.12);
+  color: #675c52;
+}
+
+.inline-oxford {
+  font-weight: 700;
+}
+
+.text-oxford-3000 {
+  color: #1f7b40;
+}
+
+.text-oxford-5000 {
+  color: #b13372;
+}
+
+.text-neutral {
+  color: var(--ink-soft);
 }
 
 .word-phonetic {
