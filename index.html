@@ -109,12 +109,33 @@
               音標
               <input id="phonetic-input" name="phonetic" placeholder="例如 /rɪˈzɪliənt/" />
             </label>
+            <div class="meta-grid">
+              <label>
+                同義字
+                <textarea
+                  id="synonyms-input"
+                  name="synonyms"
+                  rows="2"
+                  placeholder="例如 strong; tough; adaptable"
+                ></textarea>
+              </label>
+              <label>
+                反義字
+                <textarea
+                  id="antonyms-input"
+                  name="antonyms"
+                  rows="2"
+                  placeholder="例如 fragile; weak"
+                ></textarea>
+              </label>
+            </div>
             <button class="primary-button" type="submit">加入單字卡</button>
           </form>
 
           <div class="source-card">
             <h3>查詢資料來源</h3>
             <p><strong>詞義、音標、英文例句：</strong> dictionaryapi.dev</p>
+            <p><strong>同義字、反義字：</strong> dictionaryapi.dev</p>
             <p><strong>正體中文翻譯：</strong> MyMemory Translation API</p>
             <p><strong>CEFR / Oxford 標記：</strong> Oxford 3000 / 5000 公開字表比對</p>
             <p class="source-note">
