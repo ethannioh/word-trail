@@ -30,6 +30,8 @@ const sampleWords = [
     cefrLevel: "C1",
     oxfordLevel: "Not in Oxford 5000",
     phonetic: "/rɪˈzɪliənt/",
+    synonyms: "tough; adaptable; flexible",
+    antonyms: "fragile; weak",
     audioUrl: "",
     stage: 0,
     reviewCount: 0,
@@ -45,6 +47,8 @@ const sampleWords = [
     cefrLevel: "B2",
     oxfordLevel: "Oxford 5000",
     phonetic: "/ˈkæl.ə.breɪt/",
+    synonyms: "adjust; fine-tune",
+    antonyms: "misalign",
     audioUrl: "",
     stage: 0,
     reviewCount: 0,
@@ -80,6 +84,8 @@ const exampleTranslationInputEl = document.getElementById("example-translation-i
 const cefrInputEl = document.getElementById("cefr-input");
 const oxfordInputEl = document.getElementById("oxford-input");
 const phoneticInputEl = document.getElementById("phonetic-input");
+const synonymsInputEl = document.getElementById("synonyms-input");
+const antonymsInputEl = document.getElementById("antonyms-input");
 const queryWordEl = document.getElementById("query-word");
 const lookupStatusEl = document.getElementById("lookup-status");
 
@@ -134,6 +140,8 @@ function normalizeStoredWord(word) {
     cefrLevel: "Unknown",
     oxfordLevel: "Unknown",
     phonetic: "",
+    synonyms: "",
+    antonyms: "",
     audioUrl: "",
     ...word,
   };
@@ -237,6 +245,16 @@ function renderReviewCard(activeWord, dueWords) {
     </div>
     <p class="word-phonetic">${escapeHtml(activeWord.phonetic || "未提供音標")}</p>
     <p class="word-meaning">${escapeHtml(activeWord.meaning)}</p>
+    <div class="relation-grid">
+      <div class="relation-card">
+        <p class="relation-title">同義字</p>
+        <p class="relation-text">${escapeHtml(activeWord.synonyms || "尚未提供")}</p>
+      </div>
+      <div class="relation-card">
+        <p class="relation-title">反義字</p>
+        <p class="relation-text">${escapeHtml(activeWord.antonyms || "尚未提供")}</p>
+      </div>
+    </div>
     <div class="example-block">
       <p class="word-example">${escapeHtml(activeWord.example || "尚未提供英文例句")}</p>
       <p class="word-example-translation">${escapeHtml(
@@ -253,6 +271,7 @@ function renderReviewCard(activeWord, dueWords) {
             )}">播放字典發音</button>`
           : ""
       }
+      <button class="danger-button" type="button" data-delete-word="${activeWord.id}">刪除這個單字</button>
     </div>
     ${
       isDueWord
@@ -276,6 +295,9 @@ function renderReviewCard(activeWord, dueWords) {
   });
   reviewCardEl.querySelectorAll("[data-audio]").forEach((button) => {
     button.addEventListener("click", () => playAudio(button.dataset.audio));
+  });
+  reviewCardEl.querySelectorAll("[data-delete-word]").forEach((button) => {
+    button.addEventListener("click", () => deleteWord(button.dataset.deleteWord));
   });
 }
 
@@ -319,21 +341,28 @@ function renderAllWordsList(activeWord) {
   allWordsListEl.innerHTML = allWords
     .map(
       (word) => `
-        <button class="list-item ${activeWord && activeWord.id === word.id ? "is-active" : ""}" type="button" data-word-id="${word.id}">
-          <div class="list-item-top">
-            <strong>${escapeHtml(word.word)}</strong>
-            <span class="mini-badge ${getCefrBadgeClass(word.cefrLevel)}">${escapeHtml(
-              word.cefrLevel || "Unknown"
-            )}</span>
-          </div>
-          <span>${escapeHtml(word.meaning)}</span>
-          <small>
-            <span class="inline-oxford ${getOxfordTextClass(word.oxfordLevel)}">${escapeHtml(
-              word.oxfordLevel || "Unknown"
-            )}</span>
-            ・ 下次複習：${formatDateTime(word.nextReviewAt)}
-          </small>
-        </button>
+        <div class="list-row">
+          <button class="list-item ${activeWord && activeWord.id === word.id ? "is-active" : ""}" type="button" data-word-id="${word.id}">
+            <div class="list-item-top">
+              <strong>${escapeHtml(word.word)}</strong>
+              <span class="mini-badge ${getCefrBadgeClass(word.cefrLevel)}">${escapeHtml(
+                word.cefrLevel || "Unknown"
+              )}</span>
+            </div>
+            <span>${escapeHtml(word.meaning)}</span>
+            <small>
+              <span class="inline-oxford ${getOxfordTextClass(word.oxfordLevel)}">${escapeHtml(
+                word.oxfordLevel || "Unknown"
+              )}</span>
+              ・ 下次複習：${formatDateTime(word.nextReviewAt)}
+            </small>
+          </button>
+          <button class="icon-delete-button" type="button" data-delete-id="${word.id}" aria-label="刪除 ${escapeAttribute(
+            word.word
+          )}">
+            刪除
+          </button>
+        </div>
       `
     )
     .join("");
@@ -343,6 +372,9 @@ function renderAllWordsList(activeWord) {
       state.activeWordId = button.dataset.wordId;
       render();
     });
+  });
+  allWordsListEl.querySelectorAll("[data-delete-id]").forEach((button) => {
+    button.addEventListener("click", () => deleteWord(button.dataset.deleteId));
   });
 }
 
@@ -356,6 +388,8 @@ function handleAddWord(event) {
   const cefrLevel = cefrInputEl.value.trim() || "Unknown";
   const oxfordLevel = oxfordInputEl.value.trim() || "Unknown";
   const phonetic = phoneticInputEl.value.trim();
+  const synonyms = normalizeWordList(synonymsInputEl.value);
+  const antonyms = normalizeWordList(antonymsInputEl.value);
 
   if (!word || !meaning) {
     setLookupStatus("請至少先填入英文單字與中文意思。", "error");
@@ -371,6 +405,8 @@ function handleAddWord(event) {
     cefrLevel,
     oxfordLevel,
     phonetic,
+    synonyms,
+    antonyms,
     audioUrl: state.lookupAudioUrl,
     stage: 0,
     reviewCount: 0,
@@ -405,6 +441,8 @@ async function handleLookupWord() {
     cefrInputEl.value = lookupResult.cefrLevel;
     oxfordInputEl.value = lookupResult.oxfordLevel;
     phoneticInputEl.value = lookupResult.phonetic;
+    synonymsInputEl.value = lookupResult.synonyms;
+    antonymsInputEl.value = lookupResult.antonyms;
     state.lookupAudioUrl = lookupResult.audioUrl;
     setLookupStatus("已自動填入詞義、例句、例句翻譯與等級資訊。", "success");
   } catch (error) {
@@ -439,6 +477,8 @@ async function fetchWordDetails(word) {
     cefrLevel: levelInfo.cefrLevel || fallbackLevel.cefrLevel || "Unknown",
     oxfordLevel: levelInfo.oxfordLevel || fallbackLevel.oxfordLevel || "Not in Oxford 5000",
     phonetic: parsedEntry.phonetic,
+    synonyms: normalizeWordList(parsedEntry.synonyms.join("; ")),
+    antonyms: normalizeWordList(parsedEntry.antonyms.join("; ")),
     audioUrl: parsedEntry.audioUrl,
   };
 }
@@ -447,14 +487,23 @@ function parseDictionaryEntry(entries, originalWord) {
   const entry = entries.find(Boolean) || {};
   const phonetic = entry.phonetic || findFirstPhonetic(entry.phonetics || []);
   const audioUrl = findFirstAudio(entry.phonetics || []);
+  const synonymSet = new Set();
+  const antonymSet = new Set();
 
   for (const meaning of entry.meanings || []) {
+    addWordsToSet(synonymSet, meaning.synonyms || []);
+    addWordsToSet(antonymSet, meaning.antonyms || []);
+
     for (const definition of meaning.definitions || []) {
+      addWordsToSet(synonymSet, definition.synonyms || []);
+      addWordsToSet(antonymSet, definition.antonyms || []);
       if (definition.definition) {
         return {
           definition: definition.definition,
           example: definition.example || entry.example || "",
           phonetic: phonetic || "",
+          synonyms: Array.from(synonymSet).slice(0, 8),
+          antonyms: Array.from(antonymSet).slice(0, 8),
           audioUrl: audioUrl || "",
           word: entry.word || originalWord,
         };
@@ -466,9 +515,20 @@ function parseDictionaryEntry(entries, originalWord) {
     definition: "",
     example: "",
     phonetic: phonetic || "",
+    synonyms: Array.from(synonymSet).slice(0, 8),
+    antonyms: Array.from(antonymSet).slice(0, 8),
     audioUrl: audioUrl || "",
     word: entry.word || originalWord,
   };
+}
+
+function addWordsToSet(targetSet, values) {
+  for (const value of values) {
+    const cleaned = String(value || "").trim();
+    if (cleaned) {
+      targetSet.add(cleaned);
+    }
+  }
 }
 
 function findFirstPhonetic(phonetics) {
@@ -638,6 +698,28 @@ function handleReview(wordId, result) {
   render();
 }
 
+function deleteWord(wordId) {
+  const targetWord = state.words.find((word) => word.id === wordId);
+  if (!targetWord) {
+    return;
+  }
+
+  const confirmed = window.confirm(`確定要刪除單字「${targetWord.word}」嗎？`);
+  if (!confirmed) {
+    return;
+  }
+
+  state.words = state.words.filter((word) => word.id !== wordId);
+
+  if (state.activeWordId === wordId) {
+    state.activeWordId = state.words[0]?.id || "";
+  }
+
+  saveWords();
+  setLookupStatus(`已刪除單字：${targetWord.word}`, "success");
+  render();
+}
+
 function requestNotificationPermission() {
   if (!("Notification" in window)) {
     state.notificationPermission = "unsupported";
@@ -762,6 +844,14 @@ function setLookupLoading(isLoading) {
   state.isLookingUp = isLoading;
   queryWordEl.disabled = isLoading;
   queryWordEl.textContent = isLoading ? "查詢中..." : "查詢單字";
+}
+
+function normalizeWordList(text) {
+  return String(text || "")
+    .split(/[;,]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join("; ");
 }
 
 function escapeHtml(text) {
