@@ -397,6 +397,28 @@ button {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.source-card {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 248, 237, 0.82);
+  border: 1px solid rgba(170, 119, 58, 0.14);
+}
+
+.source-card h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.source-card p {
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+}
+
+.source-note {
+  font-size: 0.9rem;
+}
+
 @media (min-width: 920px) {
   .app-shell {
     padding: 28px 24px 64px;
