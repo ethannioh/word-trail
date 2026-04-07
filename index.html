@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ef6b39" />
+    <meta
+      name="description"
+      content="手機優先的 PWA 背單字工具，支援簡化版遺忘曲線複習。"
+    />
+    <title>Word Trail</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon-192.svg" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel">
+        <p class="eyebrow">手機優先 PWA 背單字</p>
+        <h1>Word Trail</h1>
+        <p class="hero-copy">
+          用簡化版遺忘曲線安排複習節奏，打開手機就知道今天該複習哪些單字。
+        </p>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-label">待複習</span>
+            <strong id="due-count">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">單字總數</span>
+            <strong id="total-count">0</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">提醒狀態</span>
+            <strong id="permission-label">未開啟</strong>
+          </article>
+        </div>
+
+        <div class="hero-actions">
+          <button class="primary-button" id="enable-notification" type="button">開啟複習提醒</button>
+          <button class="ghost-button" id="speak-word" type="button">朗讀目前單字</button>
+        </div>
+        <p class="hint-text">
+          第一版提醒以瀏覽器通知為主。若要更穩定的背景推播，後續再接 Web Push。
+        </p>
+      </section>
+
+      <section class="content-grid">
+        <article class="review-panel">
+          <div class="section-heading">
+            <h2>今日複習</h2>
+            <span id="review-subtitle">請給自己一個回憶評分</span>
+          </div>
+
+          <div id="review-card" class="word-card"></div>
+        </article>
+
+        <article class="form-panel">
+          <div class="section-heading">
+            <h2>新增單字</h2>
+            <span>可先查詢再存成單字卡</span>
+          </div>
+
+          <form class="word-form" id="word-form">
+            <label>
+              英文單字
+              <input id="word-input" name="word" placeholder="例如 resilient" required />
+            </label>
+            <div class="lookup-row">
+              <button class="primary-button" id="query-word" type="button">查詢單字</button>
+              <p class="lookup-status" id="lookup-status" data-state="idle">
+                輸入英文單字後，可自動帶入詞義、例句、翻譯與等級。
+              </p>
+            </div>
+            <label>
+              中文意思
+              <input id="meaning-input" name="meaning" placeholder="例如 有韌性的" required />
+            </label>
+            <label>
+              英文例句
+              <textarea
+                id="example-input"
+                name="example"
+                rows="3"
+                placeholder="例如 She stayed resilient after several failed interviews."
+              ></textarea>
+            </label>
+            <label>
+              例句正體中文翻譯
+              <textarea
+                id="example-translation-input"
+                name="example_translation"
+                rows="3"
+                placeholder="例如 即使經歷了好幾次求職面試失敗，她依然保持韌性。"
+              ></textarea>
+            </label>
+            <div class="meta-grid">
+              <label>
+                CEFR 等級
+                <input id="cefr-input" name="cefr" placeholder="例如 B2" />
+              </label>
+              <label>
+                Oxford 標記
+                <input id="oxford-input" name="oxford" placeholder="例如 Oxford 3000" />
+              </label>
+            </div>
+            <label>
+              音標
+              <input id="phonetic-input" name="phonetic" placeholder="例如 /rɪˈzɪliənt/" />
+            </label>
+            <button class="primary-button" type="submit">加入單字卡</button>
+          </form>
+        </article>
+
+        <article class="list-panel">
+          <div class="section-heading">
+            <h2>接下來要複習</h2>
+            <span>依時間排序</span>
+          </div>
+          <div id="upcoming-list" class="word-list"></div>
+        </article>
+      </section>
+
+      <section class="content-grid lower-grid">
+        <article class="list-panel">
+          <div class="section-heading">
+            <h2>全部單字</h2>
+            <span>可隨時挑選複習</span>
+          </div>
+          <div id="all-words-list" class="word-list"></div>
+        </article>
+
+        <article class="form-panel">
+          <div class="section-heading">
+            <h2>使用說明</h2>
+            <span>適合放在 GitHub 的靜態網站</span>
+          </div>
+          <div class="guide-card">
+            <p>1. 先新增自己的英文單字、中文意思與例句。</p>
+            <p>2. 到期單字會出現在「今日複習」。</p>
+            <p>3. 每次評分後，系統會重新安排下次複習時間。</p>
+            <p>4. 將本專案放到 GitHub Pages、Netlify 或其他靜態空間即可使用。</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

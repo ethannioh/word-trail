@@ -1,0 +1,10 @@
+# Local browser / editor noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Python local preview cache
+__pycache__/
+
+# VS Code local settings
+.vscode/
