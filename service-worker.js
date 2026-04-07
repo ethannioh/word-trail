@@ -1,4 +1,4 @@
-const CACHE_NAME = "word-trail-static-cache-v1";
+const CACHE_NAME = "word-trail-static-cache-v2";
 const ASSETS = [
   "./",
   "./index.html",
